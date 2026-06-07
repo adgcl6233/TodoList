@@ -1,4 +1,3 @@
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import sqlite3
@@ -17,17 +16,40 @@ def get_db():
 def init_db():
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS tasks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            content TEXT,
-            category TEXT NOT NULL,
-            completed BOOLEAN DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
+    
+    # 检查是否已有due_date列
+    cursor.execute("PRAGMA table_info(tasks)")
+    columns = [col[1] for col in cursor.fetchall()]
+    
+    if 'due_date' not in columns:
+        # 如果是旧表，需要添加新列
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                content TEXT,
+                category TEXT NOT NULL,
+                completed BOOLEAN DEFAULT 0,
+                due_date DATETIME,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+    else:
+        # 表已存在，确保结构正确
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                content TEXT,
+                category TEXT NOT NULL,
+                completed BOOLEAN DEFAULT 0,
+                due_date DATETIME,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+    
     conn.commit()
     conn.close()
 
@@ -46,9 +68,14 @@ def create_task():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO tasks (title, content, category)
-        VALUES (?, ?, ?)
-    ''', (data['title'], data.get('content', ''), data['category']))
+        INSERT INTO tasks (title, content, category, due_date)
+        VALUES (?, ?, ?, ?)
+    ''', (
+        data['title'], 
+        data.get('content', ''), 
+        data['category'],
+        data.get('due_date', None)
+    ))
     conn.commit()
     task_id = cursor.lastrowid
     cursor.execute('SELECT * FROM tasks WHERE id = ?', (task_id,))
@@ -77,6 +104,9 @@ def update_task(task_id):
     if 'completed' in data:
         updates.append('completed = ?')
         params.append(data['completed'])
+    if 'due_date' in data:
+        updates.append('due_date = ?')
+        params.append(data['due_date'])
     
     updates.append('updated_at = CURRENT_TIMESTAMP')
     params.append(task_id)
