@@ -166,14 +166,29 @@ npm install --registry=https://registry.npmmirror.com
 
 ## 📸 功能演示截图
 
-### 主界面
-![主界面](https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=400&fit=crop)
+### 1. 主界面
+![主界面](screenshots/01_main_page.png)
 
-### 添加任务
-![添加任务](https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800&h=400&fit=crop)
+### 2. 添加任务后
+![添加任务后](screenshots/02_with_tasks.png)
 
-### 筛选功能
-![筛选功能](https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop)
+### 3. 分类筛选（工作）
+![分类筛选（工作）](screenshots/03_filter_work.png)
+
+### 4. 编辑模式
+![编辑模式](screenshots/04_edit_mode.png)
+
+### 5. 筛选未完成
+![筛选未完成](screenshots/05_filter_pending.png)
+
+### 功能说明
+- **任务管理**：支持完整的增删改查操作
+- **分类筛选**：按工作、学习、生活、其他等分类筛选
+- **时间显示**：任务卡片会显示剩余时间，并用颜色标记：
+  - 🟢 **青色** - 时间充足（超过24小时）
+  - 🟠 **橙色** - 即将到期（24小时内）
+  - 🔴 **红色** - 已过期
+- **完成状态**：可以查看全部、未完成或已完成的任务
 
 ## 📄 许可证
 
